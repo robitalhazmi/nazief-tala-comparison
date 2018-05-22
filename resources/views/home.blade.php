@@ -231,7 +231,12 @@
                 success: function (data, status) {
                     if (data.success == true) {
                         for (let index = 0; index < data[0].length; index++) {
-                            $('#body-table').append('<tr class="stem-result"><td>'+data[0][index]+'</td><td>'+data[1][index]+'</td><td>'+data[2][index]+'</td><td>'+data[3][index]+' detik</td><td>'+data[3][index]+' detik</td></tr>');
+                            if (data[3][index] < data[4][index]) {
+                                $('#body-table').append('<tr class="stem-result"><td>'+data[0][index]+'</td><td>'+data[1][index]+'</td><td>'+data[2][index]+'</td><td style="color:white; background-color:green;">'+data[3][index]+' detik</td><td>'+data[4][index]+' detik</td></tr>');
+                            }
+                            else {
+                                $('#body-table').append('<tr class="stem-result"><td>'+data[0][index]+'</td><td>'+data[1][index]+'</td><td>'+data[2][index]+'</td><td>'+data[3][index]+' detik</td><td style="color:white; background-color:green;">'+data[4][index]+' detik</td></tr>');
+                            }
                         }
                     }
                 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Sastrawi\Stemmer\StemmerFactory;
+use Sastrawi\Tokenizer\TokenizerFactory;
 
 class StemController extends Controller
 {
@@ -14,20 +15,11 @@ class StemController extends Controller
 
     public function postStem(Request $request)
     {
-        $kalimat = $request->sentence;
-        $kata = preg_split("/[\s,]+/", $kalimat);
         $sentence = strtolower($request->sentence);
-        $words = preg_split("/[\s,]+/", $sentence);
-        //nazief
-        $stemmerFactory = new StemmerFactory();
-        $stemmer = $stemmerFactory->createStemmer();
-        for ($i=0; $i < count($words); $i++) {
-            $before_nazief[$i] = microtime(true);
-            $outputs_nazief[$i] = $stemmer->stem($words[$i]);
-            $after_nazief[$i] = microtime(true);
-            $time_nazief[$i] = $after_nazief[$i]-$before_nazief[$i];
-        }
-        
+        $tokenizerFactory  = new TokenizerFactory();
+        $tokenizer = $tokenizerFactory->createDefaultTokenizer();
+        $tokens = $tokenizer->tokenize($sentence);
+
         $stopwords = [
             'ada', 'adanya', 'adalah', 'adapun', 'agak', 'agaknya', 'agar', 'akan', 'akankah', 'akhirnya', 'aku', 'akulah', 'amat', 'amatlah', 'anda', 'andalah', 'antar', 'diantaranya', 'antara', 'antaranya', 'diantara', 'apa', 'apaan', 'mengapa', 'apabila', 'apakah', 'apatah', 'atau', 'ataukah', 'ataupun', 'bagai', 'bagaikan', 'lah', 'lain', 'lainnya', 'melainkan', 'selaku', 'lalu', 'melalaui', 'terlalu', 'lama', 'lamanya', 'selama', 'selama-lamanya', 'selamanya', 'lebih', 'terlebih', 'bermacam', 'bermacam-macam', 'macam', 'semacam', 'maka', 'makanya', 'makin', 'malah', 'malahan', 'mampu', 'mampukah', 'mana', 'manakala', 'manalagi', 'masih', 'masihkah', 'semasih', 'masing',
             'sebagai', 'sebagainya', 'bagaimana', 'bagaimana', 'sebagaimana', 'bagaimanakah', 'bagi', 'bahkan', 'bahwa', 'bahwasanya', 'sebaliknya', 'banyak', 'sebanyak', 'beberapa', 'seberapa', 'begini', 'beginian', 'beginikah', 'beginilah', 'sebegini', 'begitu', 'begitukah', 'begitulah', 'begitupun', 'sebegitu', 'belum', 'belumlah', 'sebelum', 'sebelumnya', 'sebenarnya', 'berapa', 'berapakah', 'berapalah', 'berapapun', 'betulkah', 'sebetulnya', 'biasa', 'biasanya', 'bila', 'bilakah', 'bisa', 'bisakah', 'sebisanya', 'boleh', 'bolehkah', 'bolehlah', 'buat', 'bukan', 'bukankah', 'bukanlah', 'bukannya', 'masing-masing', 'mau', 'maupun', 'semaunya', 'memang', 'mereka', 'merekalah', 'meski', 'meskipun', 'semula', 'mungkin', 'mungkinkah', 'nah', 'namun', 'nanti', 'nantinya', 'nyaris', 'oleh', 'olehnya', 'seorang', 'seseorang', 'pada', 'padanya', 'padahal', 'paling', 'sepanjang', 'pantas', 'sepantasnya', 'sepantasnyalah', 'para', 'pasti', 'pastilah', 'per', 'pernah', 'pula', 'pun', 'merupakan', 'rupanya', 'serupa', 'saat', 'saatnya', 'sesaat', 'saja', 'sajalah', 'saling', 'bersama', 'bersama-sama', 'sama', 'sama-sama', 'sesama', 'sambil',
@@ -38,7 +30,17 @@ class StemController extends Controller
             'diingatkan', 'ingat', 'ingat-ingat', 'mengingat', 'mengingatkan', 'seingat', 'teringat', 'teringat-ingat', 'berkeinginan', 'diinginkan', 'keinginan', 'menginginkan', 'jadi', 'jadilah', 'jadinya', 'menjadi', 'terjadi', 'terjadilah', 'terjadinya', 'jauh', 'sejauh', 'dijawab', 'jawab', 'jawaban', 'jawabnya', 'menjawab', 'dijelaskan', 'dijelaskannya', 'jelas', 'jelaskan', 'jelaslah', 'jelasnya', 'menjelaskan', 'berjumlah', 'jumlah', 'jumlahnya', 'sejumlah', 'sekadar', 'sekadarnya', 'kasus', 'berkata', 'dikatakan', 'dikatannya', 'kata', 'katakan', 'katakanlah', 'katanya', 'mengatakan', 'mengatakannya', 'sekecil', 'keluar', 'diketahui', 'diketahuinya', 'mengetahui', 'tahu', 'tahun', 'ditambahkan', 'menambahkan', 'tambah', 'tambahnya', 'tampak', 'tampaknya', 'ditandaskan', 'menandaskan', 'tandas', 'tandasnya', 'bertanya', 'bertanya-tanya', 'dipertanyakan', 'ditanya', 'ditanyai', 'ditanyakan', 'mempertanyakan', 'menanya', 'menanyai', 'menanyakan', 'pertanyaan', 'pertanyakan', 'tanya', 'tanyakan', 'tanyanya', 'ditegaskan', 'menegaskan', 'tegas', 'tegasnya', 'setempat', 'tempat', 'setengah', 'tengah', 'tepat', 'terus', 'tetap', 'setiba', 'setibanya', 'tiba', 'tiba-tiba', 'tiga', 'setinggi', 'tinggi', 'ditujukan', 'menuju', 'tertuju',
             'kembali', 'berkenan', 'mengenai', 'bekerja', 'dikerjakan', 'mengerjakan', 'dikira', 'diperkirakan', 'kira', 'kira-kira', 'memperkirakan', 'mengira', 'terkira', 'kurang', 'sekurang-kurangnya', 'sekurangnya', 'berlainan', 'dilakukan', 'melakukan', 'berlalu', 'dilalui', 'ketelaluan', 'kelamaan', 'berlangsung', 'lanjut', 'lanjutnya', 'selanjutnya', 'berlebihan', 'lewat', 'dilihat', 'diperlihatkan', 'kelihatan', 'kelihatannya', 'melihat', 'melihatnya', 'memperlihatkan', 'terlihat', 'kelima', 'lima', 'luar', 'bermaksud', 'dimaksud', 'dimaksudkan', 'dimaksudkannya', 'dimaksudnya', 'semampu', 'semampunya', 'ditunjuk', 'ditunjuki', 'ditunjukkan', 'ditunjukkannya', 'ditunjuknya', 'menunjuk', 'menunjuki', 'menunjukkan', 'menunjukknya', 'tunjuk', 'berturut', 'berturut-turut', 'menurut', 'turut', 'bertutur', 'dituturkan', 'dituturkannya', 'menuturkan', 'tutur', 'tuturnya', 'diucapkan', 'diucapkannya', 'mengucapkan', 'mengucapkannya', 'ucap', 'ucapnya', 'berujar', 'ujar', 'ujarnya', 'umum', 'umumnya', 'diungkapkan', 'mengungkapkan', 'ungkap', 'ungkapnya', 'untuk', 'usah', 'seusai', 'usai', 'terutama', 'waktu', 'waktunya', 'meyakini', 'meyakinkan', 'yakin' 
         ];
-        $stem_nazief = preg_replace('/\b('.implode('|',$stopwords).')\b/','',$outputs_nazief);
+        $words = preg_replace('/\b('.implode('|',$stopwords).')\b/','',$tokens);
+        
+        //nazief
+        $stemmerFactory = new StemmerFactory();
+        $stemmer = $stemmerFactory->createStemmer();
+        for ($i=0; $i < count($words); $i++) {
+            $before_nazief[$i] = microtime(true);
+            $stem_nazief[$i] = $stemmer->stem($words[$i]);
+            $after_nazief[$i] = microtime(true);
+            $time_nazief[$i] = $after_nazief[$i]-$before_nazief[$i];
+        }
         //tala
         for ($i=0; $i < count($words); $i++) {
             $before_tala[$i] = microtime(true);
@@ -120,11 +122,11 @@ class StemController extends Controller
             }else if(substr($words[$i], -2)== "an"){
                 $words[$i] = substr($words[$i], 0, -2);
             }
-            $outputs_tala[$i] = $words[$i];
+            $stem_tala[$i] = $words[$i];
             $after_tala[$i] = microtime(true);
             $time_tala[$i] = $after_tala[$i]-$before_tala[$i];
         }
-        $stem_tala = preg_replace('/\b('.implode('|',$stopwords).')\b/','',$outputs_tala);
-        return response()->json([$kata, $stem_nazief, $stem_tala, $time_nazief, $time_tala,'success' => true]);
+        
+        return response()->json([$tokens, $stem_nazief, $stem_tala, $time_nazief, $time_tala,'success' => true]);
     }
 }
