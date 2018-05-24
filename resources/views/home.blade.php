@@ -175,13 +175,16 @@
                             <th>Kata</th>
                             <th>Stem (Nazief Adriani)</th>
                             <th>Stem (Tala)</th>
-                            <th>Waktu (Nazief Adriani)</th>
-                            <th>Waktu (Tala)</th>
+                            <th>Waktu (Nazief Adriani) detik</th>
+                            <th>Waktu (Tala) detik</th>
                         </tr>
                         </thead>
                         <tbody id="body-table">
                         </tbody>
                     </table>
+                    <p id="nazief-accuration"></p>
+                    <p id="tala-accuration"></p>
+
                     </section>
             </div><!-- /content-panel -->
          </div><!-- /col-lg-4 -->			
@@ -230,14 +233,37 @@
                 data: $("#sentence-form").serialize(),
                 success: function (data, status) {
                     if (data.success == true) {
-                        for (let index = 0; index < data[0].length; index++) {
-                            if (data[3][index] < data[4][index]) {
-                                $('#body-table').append('<tr class="stem-result"><td>'+data[0][index]+'</td><td>'+data[1][index]+'</td><td>'+data[2][index]+'</td><td style="color:white; background-color:green;">'+data[3][index]+' detik</td><td>'+data[4][index]+' detik</td></tr>');
-                            }
-                            else {
-                                $('#body-table').append('<tr class="stem-result"><td>'+data[0][index]+'</td><td>'+data[1][index]+'</td><td>'+data[2][index]+'</td><td>'+data[3][index]+' detik</td><td style="color:white; background-color:green;">'+data[4][index]+' detik</td></tr>');
+                        var tala_total = 0;
+                        var tala_correct = 0;
+                        console.log(data[2]);
+                        
+                        for (let index = 0; index < data[2].length; index++) {
+                            if (data[2][index] != "") {
+                                tala_total++;
                             }
                         }
+                        for (let index = 0; index < data[0].length; index++) {
+                            if ((data[3][index] < data[4][index]) && (data[1][index] == data[2][index])) {
+                                $('#body-table').append('<tr class="stem-result"><td>'+data[0][index]+'</td><td style="color:white; background-color:green;">'+data[1][index]+'</td><td style="color:white; background-color:green;">'+data[2][index]+'</td><td style="color:white; background-color:green;">'+data[3][index]+'</td><td>'+data[4][index]+'</td></tr>');
+                                if (data[2][index] != "") {
+                                    tala_correct++;
+                                }
+                            }
+                            else if((data[3][index] < data[4][index]) && (data[1][index] != data[2][index])) {
+                                $('#body-table').append('<tr class="stem-result"><td>'+data[0][index]+'</td><td style="color:white; background-color:green;">'+data[1][index]+'</td><td style="color:white; background-color:red;">'+data[2][index]+'</td><td style="color:white; background-color:green;">'+data[3][index]+'</td><td>'+data[4][index]+'</td></tr>');
+                            }
+                            else if ((data[3][index] > data[4][index]) && (data[1][index] == data[2][index])) {
+                                $('#body-table').append('<tr class="stem-result"><td>'+data[0][index]+'</td><td style="color:white; background-color:green;">'+data[1][index]+'</td><td style="color:white; background-color:green;">'+data[2][index]+'</td><td>'+data[3][index]+'</td><td style="color:white; background-color:green;">'+data[4][index]+'</td></tr>');
+                                if (data[2][index] != "") {
+                                    tala_correct++;
+                                }
+                            }
+                            else if ((data[3][index] > data[4][index]) && (data[1][index] != data[2][index])) {
+                                $('#body-table').append('<tr class="stem-result"><td>'+data[0][index]+'</td><td style="color:white; background-color:green;">'+data[1][index]+'</td><td style="color:white; background-color:red;">'+data[2][index]+'</td><td>'+data[3][index]+'</td><td style="color:white; background-color:green;">'+data[4][index]+'</td></tr>');
+                            }
+                        }
+                        $('#nazief-accuration').append('<i class="fa fa-angle-right"></i> Akurasi Stemming (Tala): 100%');
+                        $('#tala-accuration').append('<i class="fa fa-angle-right"></i> Akurasi Stemming (Tala): '+(tala_correct/tala_total)*100+'%');
                     }
                 }
             })

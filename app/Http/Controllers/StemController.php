@@ -15,11 +15,11 @@ class StemController extends Controller
 
     public function postStem(Request $request)
     {
-        $sentence = strtolower($request->sentence);
+        //$sentence = strtolower($request->sentence);
+        $sentence = preg_replace("/[^A-Za-z?![:space:]]/","", strtolower($request->sentence));
         $tokenizerFactory  = new TokenizerFactory();
         $tokenizer = $tokenizerFactory->createDefaultTokenizer();
         $tokens = $tokenizer->tokenize($sentence);
-
         $stopwords = [
             'ada', 'adanya', 'adalah', 'adapun', 'agak', 'agaknya', 'agar', 'akan', 'akankah', 'akhirnya', 'aku', 'akulah', 'amat', 'amatlah', 'anda', 'andalah', 'antar', 'diantaranya', 'antara', 'antaranya', 'diantara', 'apa', 'apaan', 'mengapa', 'apabila', 'apakah', 'apatah', 'atau', 'ataukah', 'ataupun', 'bagai', 'bagaikan', 'lah', 'lain', 'lainnya', 'melainkan', 'selaku', 'lalu', 'melalaui', 'terlalu', 'lama', 'lamanya', 'selama', 'selama-lamanya', 'selamanya', 'lebih', 'terlebih', 'bermacam', 'bermacam-macam', 'macam', 'semacam', 'maka', 'makanya', 'makin', 'malah', 'malahan', 'mampu', 'mampukah', 'mana', 'manakala', 'manalagi', 'masih', 'masihkah', 'semasih', 'masing',
             'sebagai', 'sebagainya', 'bagaimana', 'bagaimana', 'sebagaimana', 'bagaimanakah', 'bagi', 'bahkan', 'bahwa', 'bahwasanya', 'sebaliknya', 'banyak', 'sebanyak', 'beberapa', 'seberapa', 'begini', 'beginian', 'beginikah', 'beginilah', 'sebegini', 'begitu', 'begitukah', 'begitulah', 'begitupun', 'sebegitu', 'belum', 'belumlah', 'sebelum', 'sebelumnya', 'sebenarnya', 'berapa', 'berapakah', 'berapalah', 'berapapun', 'betulkah', 'sebetulnya', 'biasa', 'biasanya', 'bila', 'bilakah', 'bisa', 'bisakah', 'sebisanya', 'boleh', 'bolehkah', 'bolehlah', 'buat', 'bukan', 'bukankah', 'bukanlah', 'bukannya', 'masing-masing', 'mau', 'maupun', 'semaunya', 'memang', 'mereka', 'merekalah', 'meski', 'meskipun', 'semula', 'mungkin', 'mungkinkah', 'nah', 'namun', 'nanti', 'nantinya', 'nyaris', 'oleh', 'olehnya', 'seorang', 'seseorang', 'pada', 'padanya', 'padahal', 'paling', 'sepanjang', 'pantas', 'sepantasnya', 'sepantasnyalah', 'para', 'pasti', 'pastilah', 'per', 'pernah', 'pula', 'pun', 'merupakan', 'rupanya', 'serupa', 'saat', 'saatnya', 'sesaat', 'saja', 'sajalah', 'saling', 'bersama', 'bersama-sama', 'sama', 'sama-sama', 'sesama', 'sambil',
