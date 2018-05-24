@@ -184,7 +184,8 @@
                     </table>
                     <p id="nazief-accuration"></p>
                     <p id="tala-accuration"></p>
-
+                    <p id="nazief-mean"></p>
+                    <p id="tala-mean"></p>
                     </section>
             </div><!-- /content-panel -->
          </div><!-- /col-lg-4 -->			
@@ -235,6 +236,8 @@
                     if (data.success == true) {
                         var tala_total = 0;
                         var tala_correct = 0;
+                        var nazief_tsum = 0;
+                        var tala_tsum = 0;
                         console.log(data[2]);
                         
                         for (let index = 0; index < data[2].length; index++) {
@@ -261,9 +264,13 @@
                             else if ((data[3][index] > data[4][index]) && (data[1][index] != data[2][index])) {
                                 $('#body-table').append('<tr class="stem-result"><td>'+data[0][index]+'</td><td style="color:white; background-color:green;">'+data[1][index]+'</td><td style="color:white; background-color:red;">'+data[2][index]+'</td><td>'+data[3][index]+'</td><td style="color:white; background-color:green;">'+data[4][index]+'</td></tr>');
                             }
+                            nazief_tsum += data[3][index];
+                            tala_tsum += data[4][index];
                         }
                         $('#nazief-accuration').append('<i class="fa fa-angle-right"></i> Akurasi Stemming (Tala): 100%');
                         $('#tala-accuration').append('<i class="fa fa-angle-right"></i> Akurasi Stemming (Tala): '+(tala_correct/tala_total)*100+'%');
+                        $('#nazief-mean').append('<i class="fa fa-angle-right"></i> Rata-rata (Nazief): '+nazief_tsum/data[3].length);
+                        $('#tala-mean').append('<i class="fa fa-angle-right"></i> Rata-rata (Tala): '+tala_tsum/data[4].length);
                     }
                 }
             })
